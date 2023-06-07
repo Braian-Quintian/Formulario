@@ -1,0 +1,156 @@
+<?php
+if (isset($_POST['crear'])) {
+    $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos";
+    $datos = array();
+    // Obtener los valores enviados del formulario y guardarlos en el arreglo
+    $datos['cedula'] = $_POST['cedula'] ?? '';
+    $datos['nombre'] = $_POST['nombre'] ?? '';
+    $datos['apellido'] = $_POST['apellido'] ?? '';
+    $datos['direccion'] = $_POST['direccion'] ?? '';
+    $datos['edad'] = $_POST['edad'] ?? '';
+    $datos['email'] = $_POST['email'] ?? '';
+    $datos['horario'] = $_POST['horario'] ?? '';
+    $datos['team'] = $_POST['team'] ?? '';
+    $datos['trainer'] = $_POST['trainer'] ?? '';
+
+    $data = json_encode($datos);
+
+    $options = [
+        'http' => [
+            'method' => 'POST',
+            'header' => 'Content-Type: application/json',
+            'content' => $data
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $response = file_get_contents($url, false, $context);
+}
+
+if (isset($_POST['borrar'])) {
+    $cedula = $_POST['cedula'] ?? '';
+
+    // Obtener el ID del usuario a partir de la cédula
+    $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos?search=" . urlencode($cedula);
+    $response = file_get_contents($url);
+    $usuarios = json_decode($response, true);
+
+    // Si se encontró un usuario con la cédula especificada, se borra
+    if (!empty($usuarios)) {
+        $id = $usuarios[0]['id'] ?? '';
+
+        if (!empty($id)) {
+            $borrarUrl = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos/" . $id;
+            $options = [
+                'http' => [
+                    'method' => 'DELETE',
+                    'header' => 'Content-Type: application/json'
+                ]
+            ];
+
+            $context = stream_context_create($options);
+            $response = file_get_contents($borrarUrl, false, $context);
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        div {
+            display: grid;
+            gap: 10px;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div>
+            <form method="POST">
+                <label for="nombre">Nombre</label>
+                <input name="nombre" type="text" placeholder="Ejemplo: Pepito">
+                <h1>Campuslands</h1>
+                <label for="apellido">Apellido</label>
+                <input name="apellido" type="text" placeholder="Ejemplo: Peréz">
+                <label for="direccion">Dirección</label>
+                <input name="direccion" type="text" placeholder="Ejemplo: Kra 123 #25-2">
+                <label for="edad">Edad</label>
+                <input name="edad" type="number" placeholder="Ejemplo: 25">
+                <label for="email">Email</label>
+                <input name="email" type="email" placeholder="Ejemplo: example@gmail.com">
+                <label for="horario">Horario De Entrada</label>
+                <input name="horario" type="time" placeholder="Ejemplo: 08:00">
+                <label for="team">Team</label>
+                <input name="team" type="text" placeholder="Ejemplo: 1">
+                <label for="trainer">Trainer</label>
+                <input name="trainer" type="text" placeholder="Ejemplo: 1">
+                <button type="submit" value="crear" name="crear">Crear</button>
+                <button type="submit" value="borrar" name="borrar">Borrar</button>
+                <button type="submit" value="actualizar" name="actualizar">Actualizar</button>
+                <button type="submit" value="consultar" name="consultar">Consultar</button>
+                <label for="cedula">Cédula</label>
+                <input type="number" name="cedula" placeholder="Cédula" required>
+            </form>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Dirección</th>
+                    <th>Edad</th>
+                    <th>Email</th>
+                    <th>Horario De Entrada</th>
+                    <th>Team</th>
+                    <th>Trainer</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
