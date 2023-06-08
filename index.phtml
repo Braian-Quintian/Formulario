@@ -1,156 +1,237 @@
 <?php
-if (isset($_POST['crear'])) {
+    if (isset($_POST['crear'])) {
+        // Código para crear un nuevo registro
+        $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos";
+        $datos = array();
+        // Obtener los valores enviados del formulario y guardarlos en el arreglo
+        $datos['cedula'] = $_POST['cedula'] ?? '';
+        $datos['nombre'] = $_POST['nombre'] ?? '';
+        $datos['apellido'] = $_POST['apellido'] ?? '';
+        $datos['direccion'] = $_POST['direccion'] ?? '';
+        $datos['edad'] = $_POST['edad'] ?? '';
+        $datos['email'] = $_POST['email'] ?? '';
+        $datos['horario'] = $_POST['horario'] ?? '';
+        $datos['team'] = $_POST['team'] ?? '';
+        $datos['trainer'] = $_POST['trainer'] ?? '';
+
+        $data = json_encode($datos);
+
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => $data
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
+    }
+
+    if (isset($_POST['borrar'])) {
+        // Código para borrar un registro
+        $cedula = $_POST['cedula'] ?? '';
+
+        // Obtener el ID del usuario a partir de la cédula
+        $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos?search=" . urlencode($cedula);
+        $response = file_get_contents($url);
+        $usuarios = json_decode($response, true);
+
+        // Si se encontró un usuario con la cédula especificada, se borra
+        if (!empty($usuarios)) {
+            $id = $usuarios[0]['id'] ?? '';
+
+            if (!empty($id)) {
+                $borrarUrl = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos/" . $id;
+                $options = [
+                    'http' => [
+                        'method' => 'DELETE',
+                        'header' => 'Content-Type: application/json'
+                    ]
+                ];
+
+                $context = stream_context_create($options);
+                $response = file_get_contents($borrarUrl, false, $context);
+            }
+        }
+    }
+
+    if (isset($_POST['actualizar'])) {
+        // Código para actualizar un registro
+        $cedula = $_POST['cedula'] ?? '';
+        $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos?search=" . urlencode($cedula);
+        $response = file_get_contents($url);
+        $usuarios = json_decode($response, true);
+
+        if (!empty($usuarios)) {
+            $id = $usuarios[0]['id'] ?? '';
+
+            if (!empty($id)) {
+                $datos = array();
+                $datos['nombre'] = $_POST['nombre'] ?? '';
+                $datos['apellido'] = $_POST['apellido'] ?? '';
+                $datos['direccion'] = $_POST['direccion'] ?? '';
+                $datos['edad'] = $_POST['edad'] ?? '';
+                $datos['email'] = $_POST['email'] ?? '';
+                $datos['horario'] = $_POST['horario'] ?? '';
+                $datos['team'] = $_POST['team'] ?? '';
+                $datos['trainer'] = $_POST['trainer'] ?? '';
+
+                $actualizarUrl = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos/" . $id;
+                $data = json_encode($datos);
+
+                $options = [
+                    'http' => [
+                        'method' => 'PUT',
+                        'header' => 'Content-Type: application/json',
+                        'content' => $data
+                    ]
+                ];
+
+                $context = stream_context_create($options);
+                $response = file_get_contents($actualizarUrl, false, $context);
+            }
+        }
+    }
+
+    // Consultar los registros
     $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos";
-    $datos = array();
-    // Obtener los valores enviados del formulario y guardarlos en el arreglo
-    $datos['cedula'] = $_POST['cedula'] ?? '';
-    $datos['nombre'] = $_POST['nombre'] ?? '';
-    $datos['apellido'] = $_POST['apellido'] ?? '';
-    $datos['direccion'] = $_POST['direccion'] ?? '';
-    $datos['edad'] = $_POST['edad'] ?? '';
-    $datos['email'] = $_POST['email'] ?? '';
-    $datos['horario'] = $_POST['horario'] ?? '';
-    $datos['team'] = $_POST['team'] ?? '';
-    $datos['trainer'] = $_POST['trainer'] ?? '';
-
-    $data = json_encode($datos);
-
-    $options = [
-        'http' => [
-            'method' => 'POST',
-            'header' => 'Content-Type: application/json',
-            'content' => $data
-        ]
-    ];
-
-    $context = stream_context_create($options);
-    $response = file_get_contents($url, false, $context);
-}
-
-if (isset($_POST['borrar'])) {
-    $cedula = $_POST['cedula'] ?? '';
-
-    // Obtener el ID del usuario a partir de la cédula
-    $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos?search=" . urlencode($cedula);
     $response = file_get_contents($url);
     $usuarios = json_decode($response, true);
 
-    // Si se encontró un usuario con la cédula especificada, se borra
-    if (!empty($usuarios)) {
-        $id = $usuarios[0]['id'] ?? '';
+    if (isset($_POST['consultar'])) {
+        $cedula = $_POST['cedula'] ?? '';
+        $consultaUrl = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos?search=" . urlencode($cedula);
+        $consultaResponse = file_get_contents($consultaUrl);
+        $consultaUsuarios = json_decode($consultaResponse, true);
 
-        if (!empty($id)) {
-            $borrarUrl = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos/" . $id;
-            $options = [
-                'http' => [
-                    'method' => 'DELETE',
-                    'header' => 'Content-Type: application/json'
-                ]
-            ];
-
-            $context = stream_context_create($options);
-            $response = file_get_contents($borrarUrl, false, $context);
+        if (!empty($consultaUsuarios)) {
+            $usuario = $consultaUsuarios[0];
+            $_POST['nombre'] = $usuario['nombre'];
+            $_POST['apellido'] = $usuario['apellido'];
+            $_POST['direccion'] = $usuario['direccion'];
+            $_POST['edad'] = $usuario['edad'];
+            $_POST['email'] = $usuario['email'];
+            $_POST['horario'] = $usuario['horario'];
+            $_POST['team'] = $usuario['team'];
+            $_POST['trainer'] = $usuario['trainer'];
         }
     }
-}
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factura</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Factura</title>
 
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
 
-        div {
-            display: grid;
-            gap: 10px;
-        }
+            div {
+                display: grid;
+                gap: 10px;
+            }
 
-        form {
-            display: grid;
-            gap: 10px;
-        }
+            form {
+                display: grid;
+                gap: 10px;
+            }
 
-        input,
-        button {
-            padding: 5px;
-        }
+            input,
+            button {
+                padding: 5px;
+            }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-        th,
-        td {
-            border: 1px solid black;
-            padding: 5px;
-        }
+            th,
+            td {
+                border: 1px solid black;
+                padding: 5px;
+            }
 
-        h1 {
-            text-align: center;
-        }
-    </style>
-</head>
+            h1 {
+                text-align: center;
+            }
+        </style>
+    </head>
 
-<body>
-    <div>
+    <body>
         <div>
-            <form method="POST">
-                <label for="nombre">Nombre</label>
-                <input name="nombre" type="text" placeholder="Ejemplo: Pepito">
-                <h1>Campuslands</h1>
-                <label for="apellido">Apellido</label>
-                <input name="apellido" type="text" placeholder="Ejemplo: Peréz">
-                <label for="direccion">Dirección</label>
-                <input name="direccion" type="text" placeholder="Ejemplo: Kra 123 #25-2">
-                <label for="edad">Edad</label>
-                <input name="edad" type="number" placeholder="Ejemplo: 25">
-                <label for="email">Email</label>
-                <input name="email" type="email" placeholder="Ejemplo: example@gmail.com">
-                <label for="horario">Horario De Entrada</label>
-                <input name="horario" type="time" placeholder="Ejemplo: 08:00">
-                <label for="team">Team</label>
-                <input name="team" type="text" placeholder="Ejemplo: 1">
-                <label for="trainer">Trainer</label>
-                <input name="trainer" type="text" placeholder="Ejemplo: 1">
-                <button type="submit" value="crear" name="crear">Crear</button>
-                <button type="submit" value="borrar" name="borrar">Borrar</button>
-                <button type="submit" value="actualizar" name="actualizar">Actualizar</button>
-                <button type="submit" value="consultar" name="consultar">Consultar</button>
-                <label for="cedula">Cédula</label>
-                <input type="number" name="cedula" placeholder="Cédula" required>
-            </form>
+            <div>
+                <form method="POST">
+                    <label for="nombre">Nombre</label>
+                    <input name="nombre" type="text" placeholder="Ejemplo: Pepito" value="<?php echo $_POST['nombre'] ?? ''; ?>">
+                    <h1>Campuslands</h1>
+                    <label for="apellido">Apellido</label>
+                    <input name="apellido" type="text" placeholder="Ejemplo: Peréz" value="<?php echo $_POST['apellido'] ?? ''; ?>">
+                    <label for="direccion">Dirección</label>
+                    <input name="direccion" type="text" placeholder="Ejemplo: Kra 123 #25-2" value="<?php echo $_POST['direccion'] ?? ''; ?>">
+                    <label for="edad">Edad</label>
+                    <input name="edad" type="number" placeholder="Ejemplo: 25" value="<?php echo $_POST['edad'] ?? ''; ?>">
+                    <label for="email">Email</label>
+                    <input name="email" type="email" placeholder="Ejemplo: example@gmail.com" value="<?php echo $_POST['email'] ?? ''; ?>">
+                    <label for="horario">Horario De Entrada</label>
+                    <input name="horario" type="time" placeholder="Ejemplo: 08:00" value="<?php echo $_POST['horario'] ?? ''; ?>">
+                    <label for="team">Team</label>
+                    <input name="team" type="text" placeholder="Ejemplo: 1" value="<?php echo $_POST['team'] ?? ''; ?>">
+                    <label for="trainer">Trainer</label>
+                    <input name="trainer" type="text" placeholder="Ejemplo: 1" value="<?php echo $_POST['trainer'] ?? ''; ?>">
+                    <button type="submit" value="crear" name="crear">Crear</button>
+                    <button type="submit" value="borrar" name="borrar">Borrar</button>
+                    <button type="submit" value="actualizar" name="actualizar">Actualizar</button>
+                    <button type="submit" value="consultar" name="consultar">Consultar</button>
+                    <label for="cedula">Cédula</label>
+                    <input type="number" name="cedula" placeholder="Cédula" required>
+                </form>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Dirección</th>
+                        <th>Edad</th>
+                        <th>Email</th>
+                        <th>Horario De Entrada</th>
+                        <th>Team</th>
+                        <th>Trainer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (!empty($usuarios)) {
+                        foreach ($usuarios as $usuario) {
+                            echo "<tr>";
+                            echo "<td>" . $usuario['nombre'] . "</td>";
+                            echo "<td>" . $usuario['apellido'] . "</td>";
+                            echo "<td>" . $usuario['direccion'] . "</td>";
+                            echo "<td>" . $usuario['edad'] . "</td>";
+                            echo "<td>" . $usuario['email'] . "</td>";
+                            echo "<td>" . $usuario['horario'] . "</td>";
+                            echo "<td>" . $usuario['team'] . "</td>";
+                            echo "<td>" . $usuario['trainer'] . "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='8'>No se encontraron usuarios.</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Dirección</th>
-                    <th>Edad</th>
-                    <th>Email</th>
-                    <th>Horario De Entrada</th>
-                    <th>Team</th>
-                    <th>Trainer</th>
-                </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
-    </div>
-</body>
+    </body>
 
 </html>
