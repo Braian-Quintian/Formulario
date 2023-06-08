@@ -2,17 +2,17 @@
     if (isset($_POST['crear'])) {
         // Código para crear un nuevo registro
         $url = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos";
-        $datos = array();
-        // Obtener los valores enviados del formulario y guardarlos en el arreglo
-        $datos['cedula'] = $_POST['cedula'] ?? '';
-        $datos['nombre'] = $_POST['nombre'] ?? '';
-        $datos['apellido'] = $_POST['apellido'] ?? '';
-        $datos['direccion'] = $_POST['direccion'] ?? '';
-        $datos['edad'] = $_POST['edad'] ?? '';
-        $datos['email'] = $_POST['email'] ?? '';
-        $datos['horario'] = $_POST['horario'] ?? '';
-        $datos['team'] = $_POST['team'] ?? '';
-        $datos['trainer'] = $_POST['trainer'] ?? '';
+        $datos = [
+            'cedula' => $_POST['cedula'] ?? '',
+            'nombre' => $_POST['nombre'] ?? '',
+            'apellido' => $_POST['apellido'] ?? '',
+            'direccion' => $_POST['direccion'] ?? '',
+            'edad' => $_POST['edad'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'horario' => $_POST['horario'] ?? '',
+            'team' => $_POST['team'] ?? '',
+            'trainer' => $_POST['trainer'] ?? ''
+        ];
 
         $data = json_encode($datos);
 
@@ -67,15 +67,16 @@
             $id = $usuarios[0]['id'] ?? '';
 
             if (!empty($id)) {
-                $datos = array();
-                $datos['nombre'] = $_POST['nombre'] ?? '';
-                $datos['apellido'] = $_POST['apellido'] ?? '';
-                $datos['direccion'] = $_POST['direccion'] ?? '';
-                $datos['edad'] = $_POST['edad'] ?? '';
-                $datos['email'] = $_POST['email'] ?? '';
-                $datos['horario'] = $_POST['horario'] ?? '';
-                $datos['team'] = $_POST['team'] ?? '';
-                $datos['trainer'] = $_POST['trainer'] ?? '';
+                $datos = [
+                    'nombre' => $_POST['nombre'] ?? '',
+                    'apellido' => $_POST['apellido'] ?? '',
+                    'direccion' => $_POST['direccion'] ?? '',
+                    'edad' => $_POST['edad'] ?? '',
+                    'email' => $_POST['email'] ?? '',
+                    'horario' => $_POST['horario'] ?? '',
+                    'team' => $_POST['team'] ?? '',
+                    'trainer' => $_POST['trainer'] ?? ''
+                ];
 
                 $actualizarUrl = "https://6480fb33f061e6ec4d4a2271.mockapi.io/datos/" . $id;
                 $data = json_encode($datos);
@@ -117,6 +118,7 @@
             $_POST['trainer'] = $usuario['trainer'];
         }
     }
+
 ?>
 
 <!DOCTYPE html>
@@ -129,21 +131,39 @@
         <title>Factura</title>
 
         <style>
-            body {
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            .content {
                 display: flex;
+                flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                height: 100vh;
+                min-height: 100vh;
+            }
+            .borde{
+                border: 1px solid black;
+            }
+            .formulario {
+                margin-top: 100px;
+                width: 800px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
             }
 
-            div {
-                display: grid;
-                gap: 10px;
-            }
-
-            form {
-                display: grid;
-                gap: 10px;
+            .div1,
+            .div2,
+            .div3,
+            .div4 {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
             }
 
             input,
@@ -163,74 +183,84 @@
             }
 
             h1 {
-                text-align: center;
+                text-align: left;
             }
         </style>
     </head>
 
     <body>
-        <div>
-            <div>
+        <div class="content">
+            <div class="borde">
                 <form method="POST">
-                    <label for="nombre">Nombre</label>
-                    <input name="nombre" type="text" placeholder="Ejemplo: Pepito" value="<?php echo $_POST['nombre'] ?? ''; ?>">
-                    <h1>Campuslands</h1>
-                    <label for="apellido">Apellido</label>
-                    <input name="apellido" type="text" placeholder="Ejemplo: Peréz" value="<?php echo $_POST['apellido'] ?? ''; ?>">
-                    <label for="direccion">Dirección</label>
-                    <input name="direccion" type="text" placeholder="Ejemplo: Kra 123 #25-2" value="<?php echo $_POST['direccion'] ?? ''; ?>">
-                    <label for="edad">Edad</label>
-                    <input name="edad" type="number" placeholder="Ejemplo: 25" value="<?php echo $_POST['edad'] ?? ''; ?>">
-                    <label for="email">Email</label>
-                    <input name="email" type="email" placeholder="Ejemplo: example@gmail.com" value="<?php echo $_POST['email'] ?? ''; ?>">
-                    <label for="horario">Horario De Entrada</label>
-                    <input name="horario" type="time" placeholder="Ejemplo: 08:00" value="<?php echo $_POST['horario'] ?? ''; ?>">
-                    <label for="team">Team</label>
-                    <input name="team" type="text" placeholder="Ejemplo: 1" value="<?php echo $_POST['team'] ?? ''; ?>">
-                    <label for="trainer">Trainer</label>
-                    <input name="trainer" type="text" placeholder="Ejemplo: 1" value="<?php echo $_POST['trainer'] ?? ''; ?>">
-                    <button type="submit" value="crear" name="crear">Crear</button>
-                    <button type="submit" value="borrar" name="borrar">Borrar</button>
-                    <button type="submit" value="actualizar" name="actualizar">Actualizar</button>
-                    <button type="submit" value="consultar" name="consultar">Consultar</button>
-                    <label for="cedula">Cédula</label>
-                    <input type="number" name="cedula" placeholder="Cédula" required>
+                    <div class="formulario">
+                        <div class="div1">
+                            <input name="nombre" type="text" placeholder="Nombre:" value="<?php echo $_POST['nombre'] ?? ''; ?>" autocomplete="off"><br>
+                            <input name="apellido" type="text" placeholder="Apellido:" value="<?php echo $_POST['apellido'] ?? ''; ?>" autocomplete="off"><br>
+                            <input name="direccion" type="text" placeholder="Dirección" value="<?php echo $_POST['direccion'] ?? ''; ?>" autocomplete="off">
+                        </div>
+                        <div class="div2">
+                            <h1>Campuslands</h1><br>
+                            <input name="edad" type="number" placeholder="Edad:" value="<?php echo $_POST['edad'] ?? ''; ?>" autocomplete="off"><br>
+                            <input name="email" type="email" placeholder="Email" value="<?php echo $_POST['email'] ?? ''; ?>" autocomplete="off">
+                        </div>
+                        <div class="div3">
+                            <label>Horario de Trabajo</label>
+                            <input name="horario" type="time" placeholder="HH:MM" value="<?php echo $_POST['horario'] ?? ''; ?>" autocomplete="off"><br>
+                            <input name="team" type="text" placeholder="Team:" value="<?php echo $_POST['team'] ?? ''; ?>" autocomplete="off"><br>
+                            <input name="trainer" type="text" placeholder="Traienr:" value="<?php echo $_POST['trainer'] ?? ''; ?>" autocomplete="off">
+                        </div>
+                        <div class="div4">
+                            <div>
+                                <button type="submit" value="crear" name="crear">Crear</button>
+                                <button type="submit" value="borrar" name="borrar">Borrar</button>
+                            </div>
+                            <div>
+                                <button type="submit" value="actualizar" name="actualizar">Actualizar</button>
+                                <button type="submit" value="consultar" name="consultar">Consultar</button>
+                            </div>
+                            <div>
+                                <input type="number" name="cedula" placeholder="Cédula" required autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
                 </form>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Dirección</th>
+                                <th>Edad</th>
+                                <th>Email</th>
+                                <th>Horario De Entrada</th>
+                                <th>Team</th>
+                                <th>Trainer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($usuarios)) {
+                                foreach ($usuarios as $usuario) {
+                                    echo "<tr>";
+                                    echo "<td>" . $usuario['nombre'] . "</td>";
+                                    echo "<td>" . $usuario['apellido'] . "</td>";
+                                    echo "<td>" . $usuario['direccion'] . "</td>";
+                                    echo "<td>" . $usuario['edad'] . "</td>";
+                                    echo "<td>" . $usuario['email'] . "</td>";
+                                    echo "<td>" . $usuario['horario'] . "</td>";
+                                    echo "<td>" . $usuario['team'] . "</td>";
+                                    echo "<td>" . $usuario['trainer'] . "</td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='8'>No se encontraron usuarios.</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Dirección</th>
-                        <th>Edad</th>
-                        <th>Email</th>
-                        <th>Horario De Entrada</th>
-                        <th>Team</th>
-                        <th>Trainer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    if (!empty($usuarios)) {
-                        foreach ($usuarios as $usuario) {
-                            echo "<tr>";
-                            echo "<td>" . $usuario['nombre'] . "</td>";
-                            echo "<td>" . $usuario['apellido'] . "</td>";
-                            echo "<td>" . $usuario['direccion'] . "</td>";
-                            echo "<td>" . $usuario['edad'] . "</td>";
-                            echo "<td>" . $usuario['email'] . "</td>";
-                            echo "<td>" . $usuario['horario'] . "</td>";
-                            echo "<td>" . $usuario['team'] . "</td>";
-                            echo "<td>" . $usuario['trainer'] . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='8'>No se encontraron usuarios.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
         </div>
     </body>
 
